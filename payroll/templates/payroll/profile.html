@@ -1,0 +1,208 @@
+{% extends 'registration/base.html' %}
+{% load static %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block page_title %}My Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== Profile Page Specific Styles ===== */
+    .profile-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    /* Profile Header Banner */
+    .profile-header {
+        background: #2c3e50;
+        padding: 30px;
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        color: #fff;
+    }
+    
+    .profile-avatar-large {
+        width: 80px;
+        height: 80px;
+        background: #077BCC;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 700;
+        text-transform: uppercase;
+        border: 4px solid rgba(255,255,255,0.2);
+    }
+
+    .profile-titles h2 {
+        margin: 0 0 5px 0;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .profile-titles p {
+        margin: 0;
+        color: #a0aec0;
+        font-size: 15px;
+    }
+
+    /* Profile Body */
+    .profile-body {
+        padding: 30px;
+    }
+
+    .profile-section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #2c3e50;
+        border-bottom: 2px solid #e8ecf1;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Details Grid */
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .detail-item {
+        background: #f8f9fb;
+        padding: 15px 20px;
+        border-radius: 8px;
+        border-left: 3px solid #077BCC;
+    }
+
+    .detail-item .label {
+        display: block;
+        font-size: 11px;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+
+    .detail-item .value {
+        display: block;
+        font-size: 15px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    /* Action Buttons */
+    .profile-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e8ecf1;
+    }
+
+    .btn-edit {
+        background: #077BCC;
+        color: #fff;
+        padding: 10px 24px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-edit:hover {
+        background: #0560a1;
+    }
+
+    @media (max-width: 600px) {
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 15px;
+        }
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    
+    <!-- Profile Header Banner -->
+    <div class="profile-header">
+        <!-- We use the employee's username (or fallback) to show the first letter -->
+        <div class="profile-avatar-large">
+            {{ employee.user.username|slice:":1" }}
+        </div>
+        <div class="profile-titles">
+            <h2>{{ employee.user.get_full_name|default:employee.user.username }}</h2>
+            <p>{{ employee.designation }} &bull; {{ employee.department|default:"Employee" }}</p>
+        </div>
+    </div>
+
+    <!-- Profile Body -->
+    <div class="profile-body">
+        <h3 class="profile-section-title">Personal & Job Information</h3>
+        
+        <div class="details-grid">
+            <!-- Employee Code / ID -->
+            <div class="detail-item">
+                <span class="label">Employee Code</span>
+                <span class="value">{{ employee.user.username }}</span>
+            </div>
+
+            <!-- Email -->
+            <div class="detail-item">
+                <span class="label">Email Address</span>
+                <span class="value">{{ employee.user.email|default:"Not provided" }}</span>
+            </div>
+
+            <!-- Phone Number (assuming your Employee model has this field) -->
+            <div class="detail-item">
+                <span class="label">Phone Number</span>
+                <span class="value">{{ employee.phone_number|default:"Not provided" }}</span>
+            </div>
+
+            <!-- Date of Joining -->
+            <div class="detail-item">
+                <span class="label">Date of Joining</span>
+                <span class="value">{{ employee.date_joined|date:"F d, Y"|default:"N/A" }}</span>
+            </div>
+
+            <!-- Designation -->
+            <div class="detail-item">
+                <span class="label">Designation</span>
+                <span class="value">{{ employee.designation|default:"N/A" }}</span>
+            </div>
+
+            <!-- Basic Salary -->
+            <div class="detail-item">
+                <span class="label">Basic Salary</span>
+                <span class="value">₹ {{ employee.basic_salary|default:"0.00" }}</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="profile-actions">
+            <!-- Update this link when you create an edit profile view -->
+            <a href="#" class="btn-edit">Edit Profile</a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

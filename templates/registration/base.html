@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Payroll{% endblock %}</title>
+<style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f4f6f9; color: #2c3e50;
+           font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
+
+    /* Side menu */
+    .sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh;
+        background: #1a2332; overflow-y: auto; z-index: 1000; }
+    
+    /* === NEW TEXT BRAND LOGO STYLES === */
+    .sidebar .brand {
+        font-size: 20px;
+        font-weight: 800;
+        text-align: center;
+        padding: 10px 20px 25px;
+        border-bottom: 1px solid #334155;
+        letter-spacing: 1px;
+    }
+
+    .menu-title { color: #64748b; font-size: 11px; text-transform: uppercase;
+        letter-spacing: 1px; padding: 14px 20px 6px; }
+    .sidebar a { display: block; padding: 11px 20px; color: #a0aec0;
+        text-decoration: none; font-size: 14px; transition: 0.2s; }
+    .sidebar a:hover, .sidebar a.active { background: #2d3748; color: #fff; border-left: 4px solid #077BCC; }
+
+    /* Main area */
+    .main { margin-left: 250px; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Header */
+    .topbar { background: #fff; height: 62px; padding: 0 25px; display: flex;
+        align-items: center; justify-content: space-between;
+        border-bottom: 1px solid #e8ecf1; }
+    .topbar h2 { margin: 0; font-size: 18px; }
+    .topbar .user { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: #696cff;
+        color: #fff; display: flex; align-items: center; justify-content: center;
+        font-weight: 700; text-transform: uppercase; }
+    .logout { background: #e74c3c; color: #fff; border: none; border-radius: 6px;
+        padding: 7px 14px; font-size: 13px; cursor: pointer; }
+    .logout:hover { background: #c0392b; }
+
+    /* Content and footer */
+    .content { flex: 1; padding: 25px; }
+    .site-footer { background: #fff; border-top: 1px solid #e8ecf1; padding: 14px 25px;
+        font-size: 13px; color: #7f8c8d; display: flex; justify-content: space-between; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .sidebar { display: none; }
+        .main { margin-left: 0; }
+        .content { padding: 15px; }
+    }
+
+    /* Print: hide menu, header, footer */
+    @media print {
+        .sidebar, .topbar, .site-footer { display: none !important; }
+        .main { margin-left: 0 !important; }
+        .content { padding: 0 !important; }
+        body { background: #fff; }
+    }
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- SIDE MENU -->
+<aside class="sidebar">
+    
+    <!-- NEW BRAND NAME (Logo Image Removed) -->
+    <div class="brand">
+        Payroll System
+    </div>
+
+    <div class="menu-title">Main</div>
+    
+    <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        Dashboard
+    </a>
+    
+    <a href="{% url 'dashboard' %}#attendance" class="{% if request.resolver_match.url_name == 'attendance' %}active{% endif %}">
+        Attendance
+    </a>
+    
+    <a href="{% url 'dashboard' %}#payroll" class="{% if request.resolver_match.url_name == 'payroll' %}active{% endif %}">
+        Payroll
+    </a>
+
+    <div class="menu-title">Account</div>
+    
+    <a href="{% url 'profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        Profile
+    </a>
+    
+    <a href="{% url 'settings' %}" class="{% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+        Settings
+    </a>
+
+</aside>
+
+<div class="main">
+
+    <!-- HEADER -->
+    <header class="topbar">
+        <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+        <div class="user">
+            <div class="avatar">{{ user.username|slice:":1" }}</div>
+            <span>{{ user.get_full_name|default:user.username }}</span>
+            <form method="post" action="{% url 'logout' %}" style="margin:0;">
+                {% csrf_token %}
+                <button type="submit" class="logout">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <span>&copy; {% now "Y" %} KURAKULA'S. All rights reserved.</span>
+        <span>Payroll Management System</span>
+    </footer>
+</div>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

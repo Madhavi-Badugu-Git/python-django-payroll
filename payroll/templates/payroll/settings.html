@@ -1,0 +1,285 @@
+{% extends 'registration/base.html' %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+
+{% block page_title %}Account Settings{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== Settings Page Specific Styles ===== */
+    .settings-container {
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    .settings-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        margin-bottom: 25px;
+        overflow: hidden;
+        border: 1px solid #e8ecf1;
+    }
+
+    .settings-header {
+        background: #f8f9fb;
+        padding: 18px 25px;
+        border-bottom: 1px solid #e8ecf1;
+    }
+
+    .settings-header h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #2c3e50;
+        font-weight: 700;
+    }
+
+    .settings-header p {
+        margin: 5px 0 0 0;
+        font-size: 13px;
+        color: #7f8c8d;
+    }
+
+    .settings-body {
+        padding: 25px;
+    }
+
+    /* Form Elements */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #2c3e50;
+        outline: none;
+        transition: border-color 0.2s;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        border-color: #077BCC;
+        box-shadow: 0 0 0 3px rgba(7, 123, 204, 0.1);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    /* Toggle Switch */
+    .toggle-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .toggle-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .toggle-text h4 {
+        margin: 0 0 3px 0;
+        font-size: 14px;
+        color: #2c3e50;
+    }
+
+    .toggle-text p {
+        margin: 0;
+        font-size: 12px;
+        color: #7f8c8d;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #cbd5e1;
+        transition: .4s;
+        border-radius: 24px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #077BCC;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+
+    /* Buttons */
+    .btn-save {
+        background: #077BCC;
+        color: #fff;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-save:hover {
+        background: #0560a1;
+    }
+
+    @media (max-width: 600px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+
+    <!-- 1. Account Preferences -->
+    <div class="settings-card">
+        <div class="settings-header">
+            <h3>General Preferences</h3>
+            <p>Update your basic account settings here.</p>
+        </div>
+        <div class="settings-body">
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" class="form-control" value="{{ employee.user.get_full_name|default:employee.user.username }}" placeholder="Your Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" class="form-control" value="{{ employee.user.email }}" placeholder="Email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Language</label>
+                    <select class="form-control">
+                        <option value="en">English</option>
+                        <option value="hi">Hindi</option>
+                        <option value="te">Telugu</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-save">Save Preferences</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. Notifications -->
+    <div class="settings-card">
+        <div class="settings-header">
+            <h3>Email Notifications</h3>
+            <p>Choose what updates you want to receive via email.</p>
+        </div>
+        <div class="settings-body">
+            
+            <div class="toggle-row">
+                <div class="toggle-text">
+                    <h4>Payslip Notifications</h4>
+                    <p>Get an email when your monthly payslip is generated.</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <div class="toggle-text">
+                    <h4>Attendance Alerts</h4>
+                    <p>Receive alerts for missed check-ins or leaves.</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <div class="toggle-text">
+                    <h4>System Announcements</h4>
+                    <p>Important updates about the payroll system.</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 3. Security -->
+    <div class="settings-card">
+        <div class="settings-header">
+            <h3>Security & Password</h3>
+            <p>Ensure your account is using a long, random password to stay secure.</p>
+        </div>
+        <div class="settings-body">
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" class="form-control" placeholder="Enter current password">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" class="form-control" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" class="form-control" placeholder="Confirm new password">
+                    </div>
+                </div>
+                <button type="submit" class="btn-save">Update Password</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

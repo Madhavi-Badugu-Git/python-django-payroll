@@ -1,0 +1,379 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payslip {{ p.month }}</title>
+<style>
+    /* === 1. GLOBAL RESET & VARIABLES === */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+        --sidebar-width: 260px;
+        --header-height: 65px;
+        --primary-color: #2c3e50;
+        --bg-color: #f4f6f9;
+        --text-color: #333;
+        --sidebar-bg: #1e293b;
+        --sidebar-hover: #334155;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--bg-color);
+        color: var(--text-color);
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* === 2. SIDEBAR MENU === */
+    .sidebar {
+        width: var(--sidebar-width);
+        background: var(--sidebar-bg);
+        color: #fff;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+    }
+    .sidebar .brand {
+        font-size: 20px;
+        font-weight: 800;
+        text-align: center;
+        padding: 10px 20px 25px;
+        border-bottom: 1px solid #334155;
+        letter-spacing: 1px;
+    }
+    .sidebar-menu {
+        list-style: none;
+        padding: 15px 0;
+        flex: 1;
+    }
+    .sidebar-menu li a {
+        display: block;
+        padding: 14px 25px;
+        color: #cbd5e1;
+        text-decoration: none;
+        font-size: 15px;
+        transition: 0.2s;
+    }
+    .sidebar-menu li a:hover, .sidebar-menu li a.active {
+        background: var(--sidebar-hover);
+        color: #fff;
+        border-left: 4px solid #077BCC;
+    }
+
+    /* === 3. MAIN CONTENT AREA === */
+    .main-wrapper {
+        margin-left: var(--sidebar-width);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* === 4. TOP HEADER === */
+    .top-header {
+        height: var(--header-height);
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+    .top-header .welcome-text { font-size: 16px; font-weight: 600; color: var(--primary-color); }
+    .top-header .user-info { display: flex; align-items: center; gap: 15px; }
+    .top-header .avatar {
+        width: 38px; height: 38px; background: #077BCC; color: #fff;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-weight: bold; font-size: 16px;
+    }
+
+    /* === 5. PAGE CONTENT === */
+    .content { padding: 30px; flex: 1; }
+
+    /* Action buttons */
+    .actions { max-width: 850px; margin: 0 auto 15px; display: flex;
+               justify-content: flex-end; gap: 8px; }
+    .btn { border: none; border-radius: 6px; padding: 8px 18px; font-size: 13px;
+           font-weight: 600; cursor: pointer; text-decoration: none; color: #fff;
+           display: inline-block; }
+    .btn-print { background: #2c3e50; }
+    .btn-download { background: #198754; }
+    .btn-back { background: #6c757d; }
+    .btn-logout { background: #ef4444; color: #fff; }
+    .btn-logout:hover { background: #dc2626; }
+
+    /* Payslip box */
+    .payslip-wrapper { max-width: 850px; margin: 0 auto; background: #fff;
+        padding: 30px 35px 25px; border: 1px solid #e8ecf1; border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+
+    /* Header */
+    .payslip-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 3px solid #2c3e50;
+        padding-bottom: 14px;
+        margin-bottom: 20px;
+        min-height: 70px;
+    }
+
+    .logo-section {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .payslip-header .center-section {
+        text-align: center;
+    }
+
+    .company-name { font-size: 24px; font-weight: 800; color: #077BCC;
+        letter-spacing: 3px; text-transform: uppercase; }
+    .company-location { font-size: 12px; color: #CC0607; letter-spacing: 2px;
+        text-transform: uppercase; font-weight: 600; }
+    .payslip-title { font-size: 16px; font-weight: 700; color: #402B34; margin-top: 2px; }
+
+    /* Employee table */
+    .employee-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+    .employee-table td { padding: 9px 16px; border: 1px solid #e8ecf1; font-size: 13px; }
+    .employee-table .label { font-weight: 600; color: #7f8c8d; font-size: 11px;
+        text-transform: uppercase; letter-spacing: 0.5px; background: #f8f9fb; width: 130px; }
+    .employee-table .value { font-weight: 600; color: #2c3e50; }
+
+    /* Main table */
+    .main-table { width: 100%; border-collapse: collapse; margin: 10px 0 14px;
+        border: 1px solid #e8ecf1; }
+    .main-table td { padding: 8px 16px; border: 1px solid #e8ecf1; font-size: 13px; }
+    .section-header { background: #2c3e50; color: #fff; font-weight: 700; font-size: 13px;
+        text-align: center; padding: 10px 14px !important; letter-spacing: 1px;
+        text-transform: uppercase; }
+    .label-cell { padding-left: 20px !important; font-weight: 500; color: #34495e; width: 35%; }
+    .amount-cell { text-align: right; font-weight: 600; padding-right: 20px !important;
+        color: #2c3e50; width: 15%; }
+    .ded .label-cell, .ded .amount-cell { color: #e74c3c; font-weight: 700; }
+    .empty-cell { background: #fafbfc; }
+    .total-row td { font-weight: 700; border-top: 3px solid #2c3e50; font-size: 14px;
+        background: #f8f9fb; padding-top: 10px; padding-bottom: 10px; }
+    .total-row .ded-total { background: #fdf2f2; border-top: 3px solid #e74c3c; color: #e74c3c; }
+
+    /* Net pay */
+    .net-pay { font-size: 18px; font-weight: 700; color: #2c3e50; padding: 14px 24px;
+        border: 2px solid #2c3e50; border-radius: 8px; margin-bottom: 12px;
+        background: #f8f9fb; display: flex; justify-content: space-between;
+        align-items: center; }
+    .net-pay .amount { font-size: 22px; font-weight: 800; padding: 4px 20px;
+        background: #fff; border-radius: 6px; border: 1px solid #e8ecf1; }
+
+    .footer { text-align: center; font-size: 11px; color: #bdc3c7; padding-top: 10px;
+        border-top: 1px solid #e8ecf1; margin-top: 8px; }
+
+    /* === 6. BOTTOM FOOTER === */
+    .bottom-footer {
+        background: #fff; text-align: center; padding: 15px;
+        font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0;
+    }
+
+    @media (max-width: 600px) {
+        .payslip-wrapper { padding: 15px; }
+        .company-name { font-size: 18px; }
+        .employee-table td, .main-table td { padding: 6px 8px; font-size: 11px; }
+        .net-pay { flex-direction: column; gap: 8px; font-size: 15px; }
+
+        /* Adjust logo on mobile so it doesn't overlap text */
+        .logo-section {
+            position: static;
+            transform: none;
+            margin-bottom: 10px;
+        }
+        .payslip-header {
+            flex-direction: column;
+            justify-content: center;
+        }
+    }
+
+    @media print {
+        @page { margin: 0.5cm; }
+        body { background: #fff; padding: 0; display: block; }
+        .no-print { display: none !important; }
+        .sidebar, .top-header, .bottom-footer { display: none !important; }
+        .main-wrapper { margin-left: 0; }
+        .content { padding: 0; }
+        .payslip-wrapper { box-shadow: none; max-width: 100%; }
+        .section-header, .employee-table .label, .total-row td, .net-pay, .ded-total {
+            -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="brand">Payroll System</div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            <li>
+                <a href="{% url 'dashboard' %}#attendance">Attendance</a>
+            </li>
+            <li>
+                <a href="{% url 'dashboard' %}#payroll" class="active">View Payslip</a>
+            </li>
+            <li>
+                <a href="{% url 'profile' %}">Profile</a>
+            </li>
+            <li>
+                <a href="{% url 'settings' %}">Settings</a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- ================= MAIN WRAPPER ================= -->
+    <div class="main-wrapper">
+
+        <!-- ================= TOP HEADER ================= -->
+        <header class="top-header no-print">
+            <div class="welcome-text">Payslip &mdash; {{ p.month }}</div>
+            <div class="user-info">
+                <span>{{ p.employee.designation }}</span>
+                <div class="avatar">{{ p.employee|stringformat:"s"|slice:":1"|upper }}</div>
+            </div>
+        </header>
+
+        <!-- ================= PAGE CONTENT ================= -->
+        <main class="content">
+
+            <!-- Buttons -->
+            <div class="actions no-print">
+                <button class="btn btn-print" onclick="window.print()">Print</button>
+                <button class="btn btn-download" id="downloadBtn" onclick="downloadPayslip()">Download</button>
+                <a class="btn btn-back" href="{% url 'dashboard' %}">Back</a>
+            </div>
+
+            <!-- Payslip -->
+            <div class="payslip-wrapper" id="payslip">
+
+                <div class="payslip-header">
+                    <!-- Logo moved to the left -->
+                    <div class="logo-section">
+                        <img src="{% static 'img/kurakulas.png' %}" alt="Logo" style="max-height: 60px;">
+                    </div>
+
+                    <!-- Center Section -->
+                    <div class="center-section">
+                        <div class="company-name">Company Name</div>
+                        <div class="company-location">Hyderabad</div>
+                        <div class="payslip-title">
+                            Payslip &mdash; {% if month_date %}{{ month_date|date:"F Y" }}{% else %}{{ p.month }}{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <table class="employee-table">
+                    <tr>
+                        <td class="label">Employee Code</td>
+                        <td class="value">{{ p.employee.user.username }}</td>
+                        <td class="label">Designation</td>
+                        <td class="value">{{ p.employee.designation }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Name</td>
+                        <td class="value">{{ p.employee }}</td>
+                        <td class="label">Pay Month</td>
+                        <td class="value">{{ p.month }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Payable Days</td>
+                        <td class="value">{{ payable_days }}</td>
+                        <td class="label">Total Days</td>
+                        <td class="value">{{ total_days }}</td>
+                    </tr>
+                </table>
+
+                <table class="main-table">
+                    <tr>
+                        <td class="section-header" colspan="2">Earnings</td>
+                        <td class="section-header" colspan="2">Deductions</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Basic</td>
+                        <td class="amount-cell">₹ {{ p.basic_salary|floatformat:2 }}</td>
+                        <td class="label-cell ded">Total Deductions</td>
+                        <td class="amount-cell ded">₹ {{ p.deductions|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Allowances</td>
+                        <td class="amount-cell">₹ {{ p.allowances|floatformat:2 }}</td>
+                        <td class="empty-cell"></td>
+                        <td class="empty-cell"></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td class="label-cell">Gross Earnings</td>
+                        <td class="amount-cell">₹ {{ gross|floatformat:2 }}</td>
+                        <td class="label-cell ded-total">Total Deductions</td>
+                        <td class="amount-cell ded-total">₹ {{ p.deductions|floatformat:2 }}</td>
+                    </tr>
+                </table>
+
+                <div class="net-pay">
+                    <span>Net Pay:</span>
+                    <span class="amount">₹ {{ p.net_salary|floatformat:2 }}</span>
+                </div>
+
+                <div class="footer">This is a system-generated payslip.</div>
+            </div>
+
+            <!-- Logout Button -->
+            <form method="post" action="{% url 'logout' %}" class="no-print" style="max-width: 850px; margin: 20px auto 0; text-align: right;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-logout">Logout</button>
+            </form>
+
+        </main>
+
+        <!-- ================= FOOTER ================= -->
+        <footer class="bottom-footer no-print">
+            &copy; 2026 Kurakula's. All rights reserved. | System generated payslip.
+        </footer>
+
+    </div>
+
+    <!-- PDF download library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function downloadPayslip() {
+            var element = document.getElementById('payslip');
+            var btn = document.getElementById('downloadBtn');
+            var options = {
+                margin: [5, 5, 5, 5],
+                filename: 'Payslip_{{ p.employee.user.username }}_{{ p.month }}.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            btn.disabled = true;
+            btn.innerText = 'Preparing...';
+            html2pdf().set(options).from(element).save().then(function () {
+                btn.disabled = false;
+                btn.innerText = 'Download';
+            }).catch(function () {
+                btn.disabled = false;
+                btn.innerText = 'Download';
+                alert('Could not generate the PDF. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>
