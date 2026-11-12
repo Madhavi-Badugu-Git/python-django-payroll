@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-bpx9+810hc8zv5plol6&j_ny(8$&y^hyjdk9g2+ppu+u*44z^m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['python-django-payroll-5.onrender.com', '.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
